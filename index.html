@@ -1,0 +1,263 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Package, 
+  ChevronRight, 
+  Layers, 
+  Info, 
+  Leaf, 
+  Sparkles, 
+  ChefHat, 
+  ShoppingBag, 
+  Milk 
+} from 'lucide-react';
+
+const App = () => {
+  const [activeFornitore, setActiveFornitore] = useState('verdura');
+  const scrollContainerRef = useRef(null);
+
+  const fornitoriData = [
+    {
+      id: 'verdura',
+      nome: 'Verdura',
+      categoria: 'Ortofrutta Fresca',
+      color: '#10B981',
+      icon: <Leaf size={18} />,
+      note: 'Consegna giornaliera entro le ore 07:00. Verificare freschezza foglie.',
+      prodotti: ['Pomodori ramati', 'Insalata Iceberg', 'Zucchine locali', 'Melanzane', 'Patate silane']
+    },
+    {
+      id: 'metro-cash',
+      nome: 'Metro Cash & Carry',
+      categoria: 'General Food & Dry',
+      color: '#6366F1',
+      icon: <ShoppingBag size={18} />,
+      note: 'Fatturazione differita. Controllare scadenze prodotti secchi.',
+      prodotti: ['Sale Fino/Grosso', 'Zucchero', 'Riso Carnaroli', 'Pasta Mista', 'Olio di Semi']
+    },
+    {
+      id: 'fuori-catalogo',
+      nome: 'Fuori Catalogo',
+      categoria: 'Ordini Speciali',
+      color: '#F43F5E',
+      icon: <Sparkles size={18} />,
+      note: 'Articoli non ricorrenti. Prezzi soggetti a variazioni di mercato.',
+      prodotti: ['Tartufo Nero', 'Ostriche Fin de Claire', 'Carne Wagyu', 'Spezie Rare']
+    },
+    {
+      id: 'latticini',
+      nome: 'Latticini',
+      categoria: 'Caseificio & Freschi',
+      color: '#0EA5E9',
+      icon: <Milk size={18} />,
+      note: 'Mantenere rigorosamente tra 0°C e 4°C.',
+      prodotti: ['Fiordilatte Napoli', 'Mozzarella di Bufala', 'Provola Affumicata', 'Ricotta Vaccina']
+    },
+    {
+      id: 'preparazione-cucina',
+      nome: 'Preparazione Cucina',
+      categoria: 'Semilavorati',
+      color: '#F59E0B',
+      icon: <ChefHat size={18} />,
+      note: 'Basi pronte prodotte esternamente con ricetta certificata.',
+      prodotti: ['Sugo pronto base', 'Pesto di basilico', 'Verdure grigliate', 'Impasti lievitati']
+    }
+  ];
+
+  const currentFornitore = fornitoriData.find(f => f.id === activeFornitore);
+
+  useEffect(() => {
+    const activeElement = document.getElementById(`tab-${activeFornitore}`);
+    if (activeElement && scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const scrollLeft = activeElement.offsetLeft - (container.offsetWidth / 2) + (activeElement.offsetWidth / 2);
+      container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    }
+  }, [activeFornitore]);
+
+  return (
+    <div className="min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans antialiased selection:bg-blue-100/30">
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .ios-blur {
+          background: rgba(255, 255, 255, 0.75);
+          backdrop-filter: saturate(200%) blur(25px);
+          -webkit-backdrop-filter: saturate(200%) blur(25px);
+        }
+
+        .ios-card {
+          background: rgba(255, 255, 255, 0.82);
+          backdrop-filter: blur(15px);
+          -webkit-backdrop-filter: blur(15px);
+          border: 0.5px solid rgba(255, 255, 255, 0.6);
+          box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.04);
+        }
+
+        .mask-nav {
+          mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+      `}</style>
+
+      {/* Main Navigation - Minimal */}
+      <nav className="h-16 ios-blur border-b border-black/5 px-8 flex items-center sticky top-0 z-[100]">
+        <div className="flex items-center gap-3 group cursor-pointer">
+          <div className="w-8 h-8 bg-black rounded-[10px] flex items-center justify-center text-white transition-transform active:scale-90">
+            <Layers size={18} strokeWidth={2.5} />
+          </div>
+          <span className="text-xl font-bold tracking-tight">
+            Inv<span className="opacity-20 font-medium">Core</span>
+          </span>
+        </div>
+      </nav>
+
+      {/* Enhanced iOS Scrolling Menu */}
+      <div className="ios-blur border-b border-black/5 py-3.5 sticky top-16 z-[90]">
+        <div className="relative max-w-6xl mx-auto flex items-center">
+          <div 
+            ref={scrollContainerRef}
+            className="flex gap-2.5 overflow-x-auto no-scrollbar px-8 mask-nav scroll-smooth w-full"
+          >
+            {fornitoriData.map((forn) => (
+              <button
+                id={`tab-${forn.id}`}
+                key={forn.id}
+                onClick={() => setActiveFornitore(forn.id)}
+                className={`relative flex items-center gap-2 px-6 py-2.5 rounded-full text-[13.5px] font-bold transition-all duration-300 whitespace-nowrap active:scale-95 ${
+                  activeFornitore === forn.id 
+                    ? 'text-white' 
+                    : 'text-black/40 hover:text-black/60'
+                }`}
+              >
+                {activeFornitore === forn.id && (
+                  <motion.div 
+                    layoutId="ios-active-pill"
+                    className="absolute inset-0 rounded-full shadow-lg shadow-black/5"
+                    style={{ 
+                      backgroundColor: forn.color,
+                      opacity: 0.95,
+                      backdropFilter: 'blur(10px)'
+                    }}
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+                  />
+                )}
+                <span className="relative z-10 flex items-center gap-2 italic">
+                  {activeFornitore === forn.id && React.cloneElement(forn.icon, { size: 15, className: "opacity-90" })}
+                  {forn.nome}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <main className="max-w-6xl mx-auto px-8 pt-12 pb-32">
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={activeFornitore}
+            initial={{ opacity: 0, y: 15, scale: 0.99 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 1.01 }}
+            transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+          >
+            {/* Header Content */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-14">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-3">
+                   <div 
+                    className="w-3 h-3 rounded-full shadow-sm border-2 border-white" 
+                    style={{ backgroundColor: currentFornitore.color }} 
+                  />
+                  <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-black/30">
+                    {currentFornitore.categoria}
+                  </span>
+                </div>
+                <h2 className="text-5xl md:text-7xl font-extrabold text-[#1C1C1E] tracking-tight leading-none">
+                  {currentFornitore.nome}
+                </h2>
+              </div>
+
+              {/* Note Box */}
+              <div className="ios-card rounded-[24px] p-5 flex items-start gap-3 border-l-[6px] max-w-sm shadow-sm" style={{ borderLeftColor: currentFornitore.color }}>
+                <div className="text-black/20 mt-0.5"><Info size={18} /></div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-black/20 mb-1">Nota Reparto</span>
+                  <p className="text-[14px] font-semibold text-black/60 leading-relaxed italic">
+                    "{currentFornitore.note}"
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Product Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {currentFornitore.prodotti.map((prod, idx) => (
+                <motion.div 
+                  key={idx} 
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.035 }}
+                  className="group ios-card p-4 rounded-[22px] flex items-center justify-between hover:bg-white hover:scale-[1.015] transition-all duration-400 cursor-pointer active:scale-95 shadow-sm"
+                >
+                  <div className="flex items-center gap-4 overflow-hidden">
+                    <div 
+                      className="w-11 h-11 rounded-[15px] flex items-center justify-center shrink-0 shadow-inner transition-transform group-hover:rotate-2"
+                      style={{ 
+                        backgroundColor: `${currentFornitore.color}15`, 
+                        color: currentFornitore.color 
+                      }}
+                    >
+                      {currentFornitore.icon}
+                    </div>
+                    <div className="flex flex-col overflow-hidden">
+                      <span className="text-[16px] font-bold text-[#1C1C1E] truncate tracking-tight">
+                        {prod}
+                      </span>
+                      <div className="flex items-center gap-1.5 opacity-30">
+                        <span className="text-[10px] font-bold uppercase tracking-tighter italic">Ref: 00{idx + 1} LIVE</span>
+                      </div>
+                    </div>
+                  </div>
+                  <ChevronRight size={16} className="text-black/10 group-hover:text-black/40 transition-colors" />
+                </motion.div>
+              ))}
+            </div>
+            
+            {/* Bottom Info Bar */}
+            <div className="mt-16 flex flex-wrap items-center justify-between gap-10 border-t border-black/5 pt-10 px-2">
+              <div className="flex gap-14">
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-bold text-black/30 uppercase tracking-[0.2em] mb-2">Affidabilità</span>
+                  <div className="text-3xl font-black tracking-tighter text-[#1C1C1E]">98.2<span className="text-black/20 text-xl font-bold">%</span></div>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-bold text-black/30 uppercase tracking-[0.2em] mb-2">Numero Prodotti</span>
+                  <div className="text-3xl font-black tracking-tighter text-[#1C1C1E]">{currentFornitore.prodotti.length}</div>
+                </div>
+              </div>
+              
+              <div className="ios-blur px-5 py-2.5 rounded-full border border-black/5 flex items-center gap-2.5 shadow-sm">
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-emerald-600/80">Sincronizzazione Live</span>
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </main>
+
+      <footer className="py-24 text-center">
+        <div className="flex items-center justify-center gap-4 opacity-10">
+          <div className="h-[1px] w-12 bg-black" />
+          <Layers size={14} />
+          <div className="h-[1px] w-12 bg-black" />
+        </div>
+        <p className="mt-4 text-[10px] font-bold text-black/20 uppercase tracking-[0.6em]">
+          InvCore Operations • v5.2.0
+        </p>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
